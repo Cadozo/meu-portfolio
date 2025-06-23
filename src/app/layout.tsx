@@ -19,8 +19,16 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="pt-BR" className="scroll-smooth">
-      <body>{children}</body>
+    <html lang="pt-BR">
+      <body>
+        {/* --- blob accent ------------------------------------------------- */}
+        <div
+          aria-hidden
+          className="fixed -top-24 -right-24 w-[480px] h-[480px]
+                     bg-accent/20 rounded-full blur-[180px] -z-10" />
+        {/* --------------------------------------------------------------- */}
+        {children}
+      </body>
     </html>
   );
 }

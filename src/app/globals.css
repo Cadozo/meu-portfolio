@@ -6,13 +6,20 @@
 @tailwind utilities;
 
 html, body {
-  @apply bg-bg text-gray-200 font-sans;
+  @apply bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950;
 }
 /* globals.css — depois das layers */
-body::before{
-  content:'';
-  position:fixed;
-  inset:0;
-  background:linear-gradient(130deg,#1e1f24 0%,#101012 60%);
-  z-index:-1;
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;      /* não bloqueia cliques */
+  z-index: -1;               /* atrás de tudo */
+  background-image: url("data:image/svg+xml,\
+    <svg xmlns='http://www.w3.org/2000/svg' width='160' height='160' fill='none'>\
+      <path fill='%23ffffff0e' d='M0 0h160v160H0z'/>\
+      <path fill='%23ffffff03' d='M80 0h1v160h-1zM0 80h160v1H0z'/>\
+    </svg>");
+  opacity: 0.08;             /* quase invisível */
+  backdrop-filter: blur(0.5px);
 }

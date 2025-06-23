@@ -28,10 +28,18 @@ export default
       {/* Heading */}
       <div className="absolute inset-0 flex flex-col items-center justify-center
                       text-center backdrop-blur-[2px]">
-        <h1 className="text-5xl md:text-7xl font-extrabold text-gray-100 drop-shadow-lg">
+        <h1
+  className="text-6xl sm:text-7xl lg:text-8xl
+             font-extrabold leading-tight tracking-tight
+              text-black/60"                      /* branco 80 % opac. */
+  style={{ WebkitTextStroke: '1px #FF9329' }}    /* contorno laranja */
+>
           Ricardo&nbsp;Barbosa
         </h1>
-        <p className="text-xl md:text-2xl mt-4 text-accent">
+        <p
+  className="text-xl sm:text-2xl font-semibold tracking-wide text-accent/90"
+  style={{ WebkitTextStroke: '1px #000000' }}
+>
           Full-stack&nbsp;Developer
         </p>
       </div>

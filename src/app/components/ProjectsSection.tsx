@@ -5,6 +5,7 @@ import { db } from '@/lib/firebase';
 import { collection, getDocs } from 'firebase/firestore';
 import Tilt from 'react-parallax-tilt';
 import { motion } from 'framer-motion';
+import { Dialog } from '@headlessui/react';
 
 type Project = {
   id: string;
@@ -16,6 +17,7 @@ type Project = {
 
 export default function ProjectsSection() {
   const [projects, setProjects] = useState<Project[]>([]);
+  const [selected, setSelected] = useState<Project | null>(null);
 
   /* ---------- Fetch Firestore ---------- */
   useEffect(() => {
@@ -38,10 +40,7 @@ export default function ProjectsSection() {
       transition={{ duration: 0.6 }}
       viewport={{ once: true }}
     >
-      <h2 className="text-3xl font-bold mb-8 text-center">
-  Projetos
-</h2>
-
+      <h2 className="text-3xl font-bold mb-8 text-center">Projetos</h2>
 
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {projects.map((p) => (
@@ -60,10 +59,21 @@ export default function ProjectsSection() {
                 <h3 className="text-lg font-semibold text-gray-100 mb-1">
                   {p.title}
                 </h3>
-                <p className="text-sm text-gray-400 mb-4 line-clamp-3">
+
+                <p className="text-sm text-gray-400 mb-4 line-clamp-3 transition-all duration-300">
                   {p.description}
                 </p>
-                <div className="flex gap-3 text-sm">
+
+                {p.description.length > 150 && (
+                  <button
+                    onClick={() => setSelected(p)}
+                    className="text-accent text-xs hover:underline"
+                  >
+                    Leia mais
+                  </button>
+                )}
+
+                <div className="flex gap-3 text-sm mt-2">
                   <a
                     href={p.repoUrl}
                     target="_blank"
@@ -88,6 +98,65 @@ export default function ProjectsSection() {
           </motion.div>
         ))}
       </div>
+
+      {/* ---------- Modal de detalhes ---------- */}
+      <Dialog
+        open={!!selected}
+        onClose={() => setSelected(null)}
+        className="relative z-50"
+      >
+        {/* Backdrop */}
+        <div
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm"
+          aria-hidden="true"
+        />
+
+        {/* Center wrapper */}
+        <div className="fixed inset-0 flex items-center justify-center p-4">
+          <Dialog.Panel className="bg-gradient-to-br from-zinc-900/90 to-zinc-800/90
++            text-gray-100 w-full max-w-lg p-6
++            rounded-2xl shadow-xl shadow-accent/10
++            border border-white/10 ring-1 ring-accent/20
++            relative max-h-[80vh] overflow-y-auto">
+            <button
+              onClick={() => setSelected(null)}
+              className="absolute top-3 right-4 text-2xl leading-none"
+              aria-label="Fechar"
+            >
+              &times;
+            </button>
+
+            <Dialog.Title className="text-2xl font-bold mb-3">
+              {selected?.title}
+            </Dialog.Title>
+
+            <p className="whitespace-pre-line mb-6">{selected?.description}</p>
+
+            <div className="flex gap-4 text-sm">
+              {selected?.repoUrl && (
+                <a
+                  href={selected.repoUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-accent hover:underline"
+                >
+                  GitHub
+                </a>
+              )}
+              {selected?.demoUrl && (
+                <a
+                  href={selected.demoUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="hover:text-accent"
+                >
+                  Demo
+                </a>
+              )}
+            </div>
+          </Dialog.Panel>
+        </div>
+      </Dialog>
     </motion.section>
   );
 }
