@@ -29,7 +29,9 @@ type Skill = {
   category: 'frontend' | 'backend' | 'database';
   icon?: string; // ex.: SiReact
 };
-
+type ProjectDoc = Omit<Project, 'id'>;
+type SkillDoc   = Omit<Skill,   'id'>;
+type SiteConfig = { about?: string; phone?: string; email?: string };
 const categories: Skill['category'][] = [
   'frontend',
   'backend',
@@ -62,35 +64,42 @@ export default function Dashboard() {
 
   /* --------- listeners --------- */
   useEffect(() => {
-    /* siteConfig/main */
-    const cfgUnsub = onSnapshot(doc(db, 'siteConfig', 'main'), (snap) => {
-      const d = snap.data() as any;
-      setAbout(d?.about ?? '');
-      setPhone(d?.phone ?? '');
-      setEmail(d?.email ?? '');
-    });
+  /* -------- siteConfig -------- */
+  const cfgUnsub = onSnapshot(doc(db, 'siteConfig', 'main'), snap => {
+    const d = snap.data() as SiteConfig | undefined;
+    setAbout(d?.about ?? '');
+    setPhone(d?.phone ?? '');
+    setEmail(d?.email ?? '');
+  });
 
-    /* projects */
-    const projQ = query(collection(db, 'projects'), orderBy('title'));
-    const projUnsub = onSnapshot(projQ, (snap) =>
-      setProjects(snap.docs.map((d) => ({ id: d.id, ...(d.data() as any) }))),
+  /* -------- projects -------- */
+  const projQ = query(collection(db, 'projects'), orderBy('title'));
+  const projUnsub = onSnapshot(projQ, snap => {
+    setProjects(
+      snap.docs.map(
+        d => ({ id: d.id, ...(d.data() as ProjectDoc) }) as Project,
+      ),
     );
+  });
 
-    /* skills */
-    const skillQ = query(
-      collection(db, 'techStack'),
-      orderBy('level', 'desc'),
+  /* -------- skills -------- */
+  const skillQ = query(collection(db, 'techStack'), orderBy('level', 'desc'));
+  const skillUnsub = onSnapshot(skillQ, snap => {
+    setSkills(
+      snap.docs.map(
+        d => ({ id: d.id, ...(d.data() as SkillDoc) }) as Skill,
+      ),
     );
-    const skillUnsub = onSnapshot(skillQ, (snap) =>
-      setSkills(snap.docs.map((d) => ({ id: d.id, ...(d.data() as any) }))),
-    );
+  });
 
-    return () => {
-      cfgUnsub();
-      projUnsub();
-      skillUnsub();
-    };
-  }, []);
+  /* -------- cleanup -------- */
+  return () => {
+    cfgUnsub();
+    projUnsub();
+    skillUnsub();
+  };
+}, []);
+
 
   /* -------------- actions -------------- */
   async function saveConfig() {
