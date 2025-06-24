@@ -1,7 +1,7 @@
 // components/ProjectsSection.tsx
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { db } from '@/lib/firebase';
 import { collection, getDocs } from 'firebase/firestore';
 import Image from 'next/image';
@@ -19,6 +19,7 @@ type Project = {
 
 export default function ProjectsSection() {
   const [projects, setProjects] = useState<Project[]>([]);
+  const [selected, setSelected] = useState<Project | null>(null); // ← modal
 
   /* ---------- Firestore ---------- */
   useEffect(() => {
@@ -31,81 +32,143 @@ export default function ProjectsSection() {
   }, []);
 
   return (
-    <section
-      id="projects"
-      /* fundo fixo cobre TODA a viewport; conteúdo desfila por cima */
-      className="
-        relative text-gray-200 overflow-hidden
-        bg-[url('/tech-bg.png')] bg-cover bg-center bg-fixed
-        before:absolute before:inset-0 before:bg-black/50 before:-z-10   /* leve escurecida */
-      "
+    <>
+      {/* ---------- modal “leia mais” ---------- */}
+{selected && (
+  <motion.div
+    initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+    exit={{ opacity: 0 }}
+    className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4"
+    onClick={() => setSelected(null)}
+  >
+    <motion.div
+      initial={{ scale: 0.9 }}
+      animate={{ scale: 1 }}
+      exit={{ scale: 0.9 }}
+      onClick={(e) => e.stopPropagation()}
+      className="max-w-lg w-full bg-[#1c1e24] rounded-2xl p-8 text-gray-200 relative"
     >
-      {/* ---------- conteúdo centralizado ---------- */}
-      <div className="max-w-5xl mx-auto px-6 pt-32 pb-32">
-        <h2 className="text-3xl font-bold mb-10 text-center text-accent">
-          Projetos em Destaque
-        </h2>
+      <button
+        onClick={() => setSelected(null)}
+        className="absolute top-3 right-3 text-gray-400 hover:text-accent"
+      >
+        ✕
+      </button>
 
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {projects.map((p) => (
-            <motion.div
-              key={p.id}
-              whileHover={{ scale: 1.04 }}
-              transition={{ type: 'spring', stiffness: 300 }}
-            >
-              <Tilt
-                tiltMaxAngleX={6}
-                tiltMaxAngleY={6}
-                scale={1.02}
-                glareEnable
-                glareMaxOpacity={0.2}
-                className="group"
+      <h3 className="text-2xl font-bold mb-4">{selected.title}</h3>
+
+      {/* área rolável se o texto for grande */}
+      <div className="max-h-[60vh] overflow-y-auto pr-1">
+        <p className="whitespace-pre-line leading-relaxed">
+          {selected.description}
+        </p>
+      </div>
+
+      <div className="flex gap-4 text-sm mt-6">
+        <a
+          href={selected.repoUrl}
+          target="_blank"
+          rel="noreferrer"
+          className="text-accent hover:underline"
+        >
+          GitHub
+        </a>
+        {selected.demoUrl && (
+          <a
+            href={selected.demoUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="hover:text-accent hover:underline"
+          >
+            Demo
+          </a>
+        )}
+      </div>
+    </motion.div>
+  </motion.div>
+)}
+
+
+      {/* ---------- seção de projetos ---------- */}
+      <section
+        id="projects"
+        className="relative min-h-[600px] overflow-hidden mt-32 text-gray-200
+                   bg-[url('/tech-bg.png')] bg-cover bg-center bg-fixed"
+      >
+        <div className="max-w-5xl mx-auto px-6 pt-32 pb-32">
+          <h2 className="text-3xl font-bold mb-10 text-center text-accent">
+            Projetos em Destaque
+          </h2>
+
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {projects.map((p) => (
+              <motion.div
+                key={p.id}
+                whileHover={{ scale: 1.04 }}
+                transition={{ type: 'spring', stiffness: 300 }}
               >
-                <article className="bg-glass backdrop-blur-glass rounded-2xl p-6 border border-white/10 shadow-glass hover:shadow-xl transition flex flex-col h-full">
-                  {p.cover && (
-                    <Image
-                      src={p.cover}
-                      alt=""
-                      width={500}
-                      height={280}
-                      className="rounded-lg mb-4 object-cover"
-                    />
-                  )}
+                <Tilt
+                  tiltMaxAngleX={6}
+                  tiltMaxAngleY={6}
+                  scale={1.02}
+                  glareEnable
+                  glareMaxOpacity={0.2}
+                  className="group"
+                >
+                  <article className="bg-glass backdrop-blur-glass rounded-2xl p-6 border border-white/10 shadow-glass hover:shadow-xl transition flex flex-col h-full">
+                    {p.cover && (
+                      <Image
+                        src={p.cover}
+                        alt=""
+                        width={500}
+                        height={280}
+                        className="rounded-lg mb-4 object-cover"
+                      />
+                    )}
 
-                  <h3 className="text-lg font-semibold text-gray-100 mb-1">
-                    {p.title}
-                  </h3>
+                    <h3 className="text-lg font-semibold text-gray-100 mb-1">
+                      {p.title}
+                    </h3>
 
-                  <p className="text-sm text-gray-400 mb-4 line-clamp-3">
-                    {p.description}
-                  </p>
+                    {/* descrição truncada */}
+                    <p className="text-sm text-gray-400 mb-4 line-clamp-3">
+                      {p.description}
+                    </p>
 
-                  <div className="mt-auto flex gap-4 text-sm">
-                    <a
-                      href={p.repoUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="text-accent hover:underline"
-                    >
-                      GitHub
-                    </a>
-                    {p.demoUrl && (
+                    <div className="flex gap-4 text-sm mt-auto">
+                      <button
+                        onClick={() => setSelected(p)}
+                        className="text-accent hover:underline"
+                      >
+                        Leia mais
+                      </button>
                       <a
-                        href={p.demoUrl}
+                        href={p.repoUrl}
                         target="_blank"
                         rel="noreferrer"
                         className="hover:text-accent hover:underline"
                       >
-                        Demo
+                        GitHub
                       </a>
-                    )}
-                  </div>
-                </article>
-              </Tilt>
-            </motion.div>
-          ))}
+                      {p.demoUrl && (
+                        <a
+                          href={p.demoUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="hover:text-accent hover:underline"
+                        >
+                          Demo
+                        </a>
+                      )}
+                    </div>
+                  </article>
+                </Tilt>
+              </motion.div>
+            ))}
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </>
   );
 }
