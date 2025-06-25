@@ -1,4 +1,3 @@
-// components/AboutSection.tsx
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -6,7 +5,7 @@ import { db } from '@/lib/firebase';
 import { doc, getDoc } from 'firebase/firestore';
 import Image from 'next/image';
 import Tilt from 'react-parallax-tilt';
-import { motion } from 'framer-motion';
+import { motion, Variants } from 'framer-motion';
 
 type AboutData = { about?: string };
 
@@ -24,8 +23,8 @@ export default function AboutSection() {
   if (!data.about) return null;
 
   /* --- small hover offset on the card --------------------------------- */
-  const textVariants = {
-    rest:  { x: 0, opacity: 1 },
+  const textVariants: Variants = {
+    rest:  { x: 0,  opacity: 1 },
     hover: { x: 12, opacity: 1, transition: { type: 'spring', stiffness: 120 } },
   };
 
