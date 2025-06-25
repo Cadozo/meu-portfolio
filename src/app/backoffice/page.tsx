@@ -11,6 +11,7 @@ import {
   deleteDoc,
   query,
   orderBy,
+  CollectionReference,
 } from 'firebase/firestore';
 
 /* ----------------------- TYPES ----------------------- */
@@ -73,23 +74,17 @@ export default function Dashboard() {
   });
 
   /* -------- projects -------- */
-  const projQ = query(collection(db, 'projects'), orderBy('title'));
+  const projCol  = collection(db, 'projects')  as CollectionReference<ProjectDoc>;
+  const projQ    = query(projCol, orderBy('title'));
   const projUnsub = onSnapshot(projQ, snap => {
-    setProjects(
-      snap.docs.map(
-        d => ({ id: d.id, ...(d.data() as ProjectDoc) }) as Project,
-      ),
-    );
+    setProjects(snap.docs.map(d => ({ id: d.id, ...d.data() })));
   });
 
   /* -------- skills -------- */
-  const skillQ = query(collection(db, 'techStack'), orderBy('level', 'desc'));
+  const skillCol = collection(db, 'techStack') as CollectionReference<SkillDoc>;
+  const skillQ   = query(skillCol, orderBy('level', 'desc'));
   const skillUnsub = onSnapshot(skillQ, snap => {
-    setSkills(
-      snap.docs.map(
-        d => ({ id: d.id, ...(d.data() as SkillDoc) }) as Skill,
-      ),
-    );
+    setSkills(snap.docs.map(d => ({ id: d.id, ...d.data() })));
   });
 
   /* -------- cleanup -------- */
@@ -99,6 +94,7 @@ export default function Dashboard() {
     skillUnsub();
   };
 }, []);
+
 
 
   /* -------------- actions -------------- */

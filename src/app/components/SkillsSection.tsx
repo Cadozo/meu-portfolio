@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from 'react';
 import { db } from '@/lib/firebase';
-import { collection, getDocs, query, orderBy } from 'firebase/firestore';
+import { collection, getDocs, query, orderBy , CollectionReference} from 'firebase/firestore';
 import * as SI from 'react-icons/si';
 import { FiCode } from 'react-icons/fi';
 import { motion } from 'framer-motion';
@@ -13,8 +13,9 @@ type Skill = {
   name: string;
   level: number;
   category: 'frontend' | 'backend' | 'database';
-  icon?: string;
+  icon?: keyof typeof SI;
 };
+type SkillDoc = Omit<Skill, 'id'>;
 
 const catColor: Record<Skill['category'], string> = {
   frontend: 'bg-indigo-500',
@@ -27,15 +28,12 @@ export default function SkillsSection() {
 
   /* ---------- Firestore ---------- */
   useEffect(() => {
-    (async () => {
-      const snap = await getDocs(
-        query(collection(db, 'techStack'), orderBy('level', 'desc')),
-      );
-      setSkills(
-        snap.docs.map((d) => ({ id: d.id, ...(d.data() as any) } as Skill)),
-      );
-    })();
-  }, []);
+  (async () => {
+    const col = collection(db, 'techStack') as CollectionReference<SkillDoc>;
+    const snap = await getDocs(query(col, orderBy('level', 'desc')));
+    setSkills(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
+  })();
+}, []);
 
   return (
     <section id="skills" className="max-w-5xl mx-auto mt-32 px-6 text-gray-200">

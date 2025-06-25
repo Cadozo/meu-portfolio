@@ -1,7 +1,7 @@
 // components/ProjectsSection.tsx
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { db } from '@/lib/firebase';
 import { collection, getDocs } from 'firebase/firestore';
 import Image from 'next/image';
@@ -23,13 +23,20 @@ export default function ProjectsSection() {
 
   /* ---------- Firestore ---------- */
   useEffect(() => {
-    (async () => {
-      const snap = await getDocs(collection(db, 'projects'));
-      setProjects(
-        snap.docs.map((d) => ({ id: d.id, ...(d.data() as any) } as Project)),
-      );
-    })();
-  }, []);
+  (async () => {
+    const snap = await getDocs(collection(db, 'projects'));
+
+    setProjects(
+      snap.docs.map(
+        (d) =>
+          ({
+            id: d.id,
+            ...(d.data() as Omit<Project, 'id'>),
+          } as Project),
+      ),
+    );
+  })();
+}, []);
 
   return (
     <>
