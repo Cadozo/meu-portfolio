@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import { Mail, MessageCircle, Github, Gitlab, Linkedin } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion, MotionProps } from 'framer-motion';
 
 /* ---------- links corretos ---------- */
 const contacts = [
@@ -25,12 +25,16 @@ const jitter = (i: number) => {
 };
 
 /* ---------- animação hover ---------- */
-const hoverAnim = {
+const hoverAnim: MotionProps = {
   whileHover: {
     y: -6,
     rotate: 2,
     scale: 1.15,
-    transition: { type: 'spring', stiffness: 200, damping: 10 },
+    transition: {
+      type: 'spring',    // literal aceito pelo Framer Motion
+      stiffness: 200,
+      damping: 10,
+    },
   },
 };
 
@@ -39,7 +43,7 @@ export default function Footer() {
 
   return (
     <footer
-      id="contact"                                    /* ← âncora para o link do menu */
+      id="contact"
       className="relative w-full overflow-hidden pt-28 pb-24"
     >
       {/* blobs de cor */}
