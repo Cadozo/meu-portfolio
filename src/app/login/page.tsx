@@ -16,10 +16,14 @@ export default function LoginPage() {
     try {
       await signInWithEmailAndPassword(auth, email, password);
       router.push('/backoffice');
-    } catch (err: any) {
+    } catch (err: unknown) {
+    if (err instanceof Error) {
       setError(err.message);
+    } else {
+      setError(String(err));
     }
   }
+}
 
   return (
     <main className="min-h-screen flex items-center justify-center bg-[#101012] text-gray-200">

@@ -7,6 +7,7 @@ import { collection, getDocs, query, orderBy , CollectionReference} from 'fireba
 import * as SI from 'react-icons/si';
 import { FiCode } from 'react-icons/fi';
 import { motion } from 'framer-motion';
+import type { IconType } from 'react-icons'; 
 
 type Skill = {
   id: string;
@@ -43,8 +44,7 @@ export default function SkillsSection() {
 
       <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {skills.map((s, i) => {
-          const Icon =
-            (s.icon && (SI as any)[s.icon as keyof typeof SI]) || FiCode;
+          const Icon: IconType = (s.icon && SI[s.icon as keyof typeof SI]) || FiCode;
           const dir = i % 2 === 0 ? -150 : 150; // alterna origem
 
           return (
