@@ -8,7 +8,7 @@ import { motion, MotionProps } from 'framer-motion';
 /* ---------- links corretos ---------- */
 const contacts = [
   { href: 'mailto:tiucado@hotmail.com', label: 'E-mail',   Icon: Mail },
-  { href: 'https://w.app/vqnwdr',       label: 'WhatsApp', Icon: MessageCircle },
+  { href: 'https://wa.me/+5541996611759?text=Ol%C3%A1%2C%20vi%20seu%20curr%C3%ADculo%20e%20tenho%20uma%20vaga%20para%20voc%C3%AA!',       label: 'WhatsApp', Icon: MessageCircle },
   { href: 'https://github.com/Cadozo',  label: 'GitHub',   Icon: Github },
   { href: 'https://gitlab.com/cadotiu', label: 'GitLab',   Icon: Gitlab },
   { href: 'https://www.linkedin.com/in/ricardo-barbosa-rodrigues/', label: 'LinkedIn', Icon: Linkedin },
